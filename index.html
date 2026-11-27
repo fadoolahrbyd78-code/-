@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6750a4">
+<title>تحدي قوة الاحتكاك | اختبار الفيزياء</title>
+<style>
+:root{--purple:#6750a4;--purple2:#eee8ff;--ink:#202033;--muted:#6c6b7a;--bg:#f6f4fb;--green:#18794e;--red:#b42318}
+*{box-sizing:border-box}
+body{margin:0;font-family:Tahoma,Arial,sans-serif;background:linear-gradient(145deg,#f6f4fb,#eef5ff);color:var(--ink);min-height:100vh;padding:22px}
+.wrap{max-width:760px;margin:0 auto}
+header{background:linear-gradient(120deg,#55408f,#8068c6);color:white;padding:26px;border-radius:22px;box-shadow:0 12px 30px #40306b22}
+header h1{margin:0 0 8px;font-size:clamp(24px,5vw,34px)}
+header p{margin:0;color:#f0ebff;line-height:1.8}
+.pill{display:inline-block;background:#ffffff22;border:1px solid #ffffff55;border-radius:30px;padding:6px 12px;font-size:13px;margin-bottom:12px}
+.card{background:white;border:1px solid #e8e4f1;border-radius:20px;padding:22px;margin-top:18px;box-shadow:0 8px 24px #3020520d}
+label{display:block;font-weight:bold;margin-bottom:9px}
+input{width:100%;padding:14px;border:1px solid #d8d3e5;border-radius:12px;font-size:16px;font-family:inherit}
+button{border:0;border-radius:12px;padding:13px 20px;font-size:16px;font-weight:bold;font-family:inherit;cursor:pointer}
+.primary{background:var(--purple);color:white;width:100%;margin-top:16px}
+.primary:disabled{opacity:.5;cursor:not-allowed}
+.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:14px;margin-bottom:14px}
+.progress{height:9px;background:#eeeaf5;border-radius:20px;overflow:hidden;margin:12px 0 22px}
+.progress>div{height:100%;background:var(--purple);width:0;transition:width .25s}
+.question{font-size:21px;line-height:1.8;margin:8px 0 18px}
+.option{display:flex;align-items:center;gap:12px;width:100%;text-align:right;background:#fff;border:1px solid #e1ddeb;margin:9px 0;padding:14px;border-radius:13px;color:var(--ink);font-weight:normal}
+.option:hover{border-color:var(--purple);background:#faf8ff}
+.option:disabled{cursor:default;opacity:1}
+.option.correct{background:#eaf7f0;border-color:#54a77d;color:#145c3c}
+.option.wrong{background:#fff0ef;border-color:#df817b;color:#8e211a}
+.letter{width:29px;height:29px;display:grid;place-items:center;background:#f0edf6;border-radius:9px;flex:none;font-weight:bold}
+.feedback{padding:13px;border-radius:12px;line-height:1.8;margin-top:14px}
+.feedback.good{background:#eaf7f0;color:#145c3c}
+.feedback.bad{background:#fff0ef;color:#8e211a}
+.hidden{display:none!important}
+.actions{display:flex;gap:10px;margin-top:18px}
+.actions button{flex:1}
+.secondary{background:#eeeaf5;color:#45366c}
+.score{font-size:42px;color:var(--purple);font-weight:bold;text-align:center;margin:8px}
+.center{text-align:center}
+.small{font-size:13px;color:var(--muted);line-height:1.8}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:22px}
+@media(max-width:520px){body{padding:12px}.card{padding:17px}.question{font-size:19px}.actions{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <span class="pill">الفيزياء • الصف الثالث الثانوي العلمي</span>
+  <h1>⚡ تحدّي قوة الاحتكاك</h1>
+  <p>اختبر فهمك لقوة الاحتكاك من خلال 10 أسئلة متنوعة، واكتشف نتيجتك في نهاية التحدي.</p>
+</header>
+
+<section id="start" class="card">
+  <h2>مرحباً بك في التحدي!</h2>
+  <p class="small">اكتب اسمك للبدء. يتكون الاختبار من 10 أسئلة اختيار من متعدد، ولكل سؤال إجابة واحدة صحيحة.</p>
+  <label for="studentName">اسم الطالب</label>
+  <input id="studentName" maxlength="40" placeholder="اكتب اسمك هنا" autocomplete="name">
+  <button class="primary" id="startBtn">ابدأ الاختبار</button>
+  <p class="small">تنبيه: هذه نسخة تدريبية. لا تُرسل الأسماء أو النتائج إلى المعلم؛ النتيجة تظهر على هذا الجهاز فقط.</p>
+</section>
+
+<section id="quiz" class="card hidden">
+  <div class="meta"><span id="studentLabel"></span><span id="counter"></span></div>
+  <div class="progress"><div id="bar"></div></div>
+  <div class="question" id="question"></div>
+  <div id="options"></div>
+  <div id="feedback" class="feedback hidden" aria-live="polite"></div>
+  <div class="actions">
+    <button id="nextBtn" class="primary" disabled>السؤال التالي</button>
+  </div>
+</section>
+
+<section id="result" class="card hidden center">
+  <h2>انتهى التحدي! 🎉</h2>
+  <p id="resultName"></p>
+  <div class="score" id="score"></div>
+  <h3 id="rating"></h3>
+  <p id="message" class="small"></p>
+  <button class="primary" id="retryBtn">إعادة الاختبار</button>
+  <button class="secondary" id="printBtn" style="width:100%;margin-top:10px">طباعة النتيجة</button>
+</section>
+<footer>تطبيق تعليمي تجريبي • تحدّي قوة الاحتكاك</footer>
+</div>
+<script>
+const questions = [
+ {q:"ما المقصود بقوة الاحتكاك بين سطحين متلامسين؟",a:["قوة تجذب الجسم نحو مركز الأرض","قوة تنشأ عند التلامس وتقاوم الحركة النسبية أو tendency الحركة بين السطحين","قوة تدفع الجسم دائماً إلى الأمام","قوة لا تظهر إلا في السوائل"],c:1,e:"الاحتكاك قوة تماس تعارض الحركة النسبية أو الاتجاه المحتمل للحركة بين السطحين."},
+ {q:"ما اتجاه قوة الاحتكاك الحركي المؤثرة في جسم ينزلق على سطح؟",a:["في اتجاه حركة الجسم دائماً","عمودياً على السطح","عكس اتجاه الحركة النسبية بين السطحين","إلى أعلى دائماً"],c:2,e:"قوة الاحتكاك الحركي تعاكس اتجاه الانزلاق النسبي عند سطح التلامس."},
+ {q:"أي علاقة تمثل مقدار قوة الاحتكاك الحركي في النموذج المدرسي المعتاد؟",a:["F = μₖ N","F = m g h","F = N ÷ μₖ","F = m ÷ a"],c:0,e:"يرمز μₖ إلى معامل الاحتكاك الحركي، وN إلى القوة العمودية؛ لذا fₖ = μₖN."},
+ {q:"إذا كان معامل الاحتكاك الحركي 0.25 والقوة العمودية 40 نيوتن، فما مقدار قوة الاحتكاك؟",a:["160 نيوتن","40 نيوتن","10 نيوتن","0.25 نيوتن"],c:2,e:"fₖ = μₖN = 0.25 × 40 = 10 نيوتن."},
+ {q:"على سطح أفقي، ما مقدار القوة العمودية المؤثرة في جسم إذا لم توجد قوى رأسية أخرى وكان الجسم متزناً رأسياً؟",a:["تساوي وزن الجسم","تساوي صفراً","أقل من الوزن دائماً","تساوي قوة الاحتكاك"],c:0,e:"في هذه الحالة تكون محصلة القوى الرأسية صفراً، لذلك N = W."},
+ {q:"ماذا يحدث للاحتكاك السكوني عندما تؤثر قوة أفقية صغيرة في جسم ساكن ولا تحركه؟",a:["يبقى صفراً دائماً","يتكيف ليوازن القوة المؤثرة حتى يبلغ حده الأقصى","يساوي دائماً الاحتكاك الحركي","يصبح أكبر من وزن الجسم"],c:1,e:"الاحتكاك السكوني قوة متغيرة المقدار، وتساوي القوة الموازية للسطح ما دام الجسم ساكناً، حتى حدها الأقصى."},
+ {q:"أي العبارات الآتية صحيحة عن معامل الاحتكاك؟",a:["يقاس بوحدة النيوتن","يقاس بوحدة المتر","ليس له وحدة قياس","يقاس بوحدة الكيلوغرام"],c:2,e:"معامل الاحتكاك نسبة بين قوتين، ولذلك فهو كمية بلا وحدة."},
+ {q:"إذا زادت القوة العمودية إلى الضعف وبقي معامل الاحتكاك الحركي ثابتاً، فماذا يحدث لقوة الاحتكاك الحركي؟",a:["تقل إلى النصف","تتضاعف","لا تتغير","تصبح صفراً"],c:1,e:"وفق العلاقة fₖ = μₖN، تتضاعف قوة الاحتكاك عندما تتضاعف القوة العمودية مع ثبات المعامل."},
+ {q:"أي مثال يوضح فائدة الاحتكاك في الحياة اليومية؟",a:["انزلاق صندوق على أرض ملساء","توقف السيارة عند استعمال المكابح","سقوط جسم نحو الأرض","طفو جسم في الماء"],c:1,e:"الاحتكاك بين أجزاء نظام المكابح والعجلات والطريق يساعد على إبطاء السيارة وإيقافها."},
+ {q:"أي وصف يميز الاحتكاك السكوني الأقصى عن الاحتكاك الحركي في النموذج المدرسي الشائع؟",a:["الاحتكاك السكوني الأقصى غالباً أكبر من الاحتكاك الحركي للسطحين نفسيهما","الاحتكاك الحركي أكبر دائماً","كلاهما يساوي وزن الجسم","لا توجد علاقة بينهما في أي نموذج"],c:0,e:"في النموذج المدرسي المعتاد يكون معامل الاحتكاك السكوني أكبر من معامل الاحتكاك الحركي، لذلك تكون قيمة الاحتكاك السكوني الأقصى أكبر عند القوة العمودية نفسها."}
+];
+let index=0, score=0, selected=false, student="";
+const $=id=>document.getElementById(id);
+function show(id){$(id).classList.remove("hidden")}
+function hide(id){$(id).classList.add("hidden")}
+function start(){
+ student=$("studentName").value.trim();
+ if(!student){$("studentName").focus();$("studentName").style.borderColor="#b42318";return}
+ index=0;score=0;selected=false;
+ $("studentLabel").textContent="الطالب: "+student;
+ hide("start");hide("result");show("quiz");render();
+}
+function render(){
+ selected=false;
+ const item=questions[index];
+ $("counter").textContent=`السؤال ${index+1} من ${questions.length}`;
+ $("bar").style.width=((index)/questions.length*100)+"%";
+ $("question").textContent=item.q;
+ $("feedback").className="feedback hidden";
+ $("feedback").textContent="";
+ $("nextBtn").disabled=true;
+ $("nextBtn").textContent=index===questions.length-1?"عرض النتيجة":"السؤال التالي";
+ const box=$("options");box.innerHTML="";
+ const letters=["أ","ب","ج","د"];
+ item.a.forEach((answer,i)=>{
+  const b=document.createElement("button");b.className="option";
+  const letter=document.createElement("span");letter.className="letter";letter.textContent=letters[i];
+  const txt=document.createElement("span");txt.textContent=answer;
+  b.append(letter,txt);b.addEventListener("click",()=>choose(i));box.appendChild(b);
+ });
+}
+function choose(choice){
+ if(selected)return;selected=true;
+ const item=questions[index], buttons=[...$("options").children];
+ buttons.forEach((b,i)=>{b.disabled=true;if(i===item.c)b.classList.add("correct");if(i===choice&&choice!==item.c)b.classList.add("wrong")});
+ const good=choice===item.c;if(good)score++;
+ $("feedback").className="feedback "+(good?"good":"bad");
+ $("feedback").textContent=(good?"إجابة صحيحة! أحسنت. ":"إجابة غير صحيحة. الإجابة الصحيحة: "+item.a[item.c]+". ")+item.e;
+ $("nextBtn").disabled=false;
+}
+function next(){
+ if(!selected)return;
+ index++;
+ if(index<questions.length)render();else finish();
+}
+function finish(){
+ hide("quiz");show("result");
+ const pct=score/questions.length*100;
+ $("resultName").textContent="نتيجة الطالب: "+student;
+ $("score").textContent=score+" / "+questions.length;
+ $("rating").textContent=pct>=90?"ممتاز جداً 🌟":pct>=70?"جيد جداً 👏":pct>=50?"جيد، واصل التقدم 💪":"تحتاج إلى مراجعة الدرس 📘";
+ $("message").textContent="حصلت على "+pct+"% من الدرجة الكلية. راجع تفسيرات الإجابات وحاول تعزيز فهمك للمفاهيم.";
+}
+$("startBtn").addEventListener("click",start);
+$("nextBtn").addEventListener("click",next);
+$("retryBtn").addEventListener("click",()=>{hide("result");show("start");$("studentName").value=student});
+$("printBtn").addEventListener("click",()=>window.print());
+$("studentName").addEventListener("keydown",e=>{if(e.key==="Enter")start()});
+</script>
+</body>
+</html>
